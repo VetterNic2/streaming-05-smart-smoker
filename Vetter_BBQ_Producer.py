@@ -61,10 +61,11 @@ def send_message(host: str, queue_name: str, message: str):
         ch.basic_publish(exchange="", routing_key=queue_name, body=message)
         # print a message to the console for the user
         # Include the queue name in the log message
-        print(f" [x] Sent message to {queue_name}")
+        logger.info(f" [x] Sent message to {queue_name}")
+        print(f" [x] Sent message to {queue_name}")  # Print confirmation
 
     except pika.exceptions.AMQPConnectionError as e:
-        print(f"Error: Connection to RabbitMQ server failed: {e}")
+        logger.error(f"Error: Connection to RabbitMQ server failed: {e}")
         sys.exit(1)
     finally:
         # close the connection to the server
