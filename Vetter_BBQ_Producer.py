@@ -84,14 +84,32 @@ def csv_smoker_reader():
 
         for smoke_row in reader:
             time_of_smoke = smoke_row[0]
-            temp_of_smoke = smoke_row[1]
-            pork_temp = smoke_row[2]
-            beef_temp = smoke_row[3]
+            temp_of_smoker = smoke_row[1]
+            foodA_temp = smoke_row[2]
+            foodB_temp = smoke_row[3]
 # I was having trouble getting my time_of-smoke(timestamp) to show correctly. I finally figured it out by looking at different repos. 
 # I needed to convert to Unix and after that, my producer worked great!
         # This sets up the file to be parsed into the matching CSV format
 
         time_of_smoke = datetime.strptime(time_of_smoke, '%m/%d/%y %H:%M:%S').timestamp()
+
+# The below will read the CSV rows and send the correct data to the correct Rabbit Queue. 
+# I have already established parameters in the "smoke_row" code above. 
+# The below code acts as a filter for the csv_smoker_reader. 
+
+        if temp_of_smoker:
+            message = struct.pack('!df', time_of_smoke, float(temp_of_smoker))
+            send_message("localhost","01-smoker", message)
+        if foodA_temp:
+            message = struct.pack('!df', time_of_smoke, float(foodA_temp))
+            send_message("localhost","02-food-A", message) 
+        if foodB_temp:
+            message = struct.pack('!df', time_of_smoke, float(foodB_temp))
+            send_message("localhost","03-food-B", message) 
+
+        time.sleep(30) # Ensures the programs delays 30 seconds during the reading process. 
+
+        
 
 
 # Standard Python idiom to indicate main program entry point
@@ -101,9 +119,6 @@ def csv_smoker_reader():
 if __name__ == "__main__":  
     # Proposes to open the RabbitMQ site
     offer_rabbitmq_admin_site()
-    # Variable definition
-    file_name = 'tasks.csv'
-    host = "localhost"
-    queue_name = "task_queue3"
-    # Calling the send function to get the tasks sent to the queue
-    csv_smoker_reader(file_name, host, queue_name)
+
+    # Calling the send function to get the tasks sent to the correct queues
+    csv_smoker_reader()
