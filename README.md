@@ -59,6 +59,6 @@ AFTER earning credit for the assignment, THEN create and share additional custom
 
 # Screenshot Verification of Working Custom Producer:
 
-
+![Alt text](work_verification.png "Verification")
 
 -Nic Vetter
