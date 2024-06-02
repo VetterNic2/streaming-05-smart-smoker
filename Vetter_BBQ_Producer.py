@@ -33,8 +33,8 @@ def offer_rabbitmq_admin_site():
     if ans.lower() == "y":
         webbrowser.open_new("http://localhost:15672/#/queues")
         print()
-# The below function is standard from our prior modules. The function will create a message to be sent to a specific queue. 
 
+# The below function is standard from our prior modules. The function will create a message to be sent to a specific queue. 
 def send_message(host: str, queue_name: str, message: str):
     """
     Creates and sends a message to the queue each execution.
@@ -60,8 +60,8 @@ def send_message(host: str, queue_name: str, message: str):
         # every message passes through an exchange
         ch.basic_publish(exchange="", routing_key=queue_name, body=message)
         # print a message to the console for the user
-        # I have set up the logger to print to the console instead of the print statement - NV
-        logger.info(f" [x] Sent {message}")
+        # Include the queue name in the log message
+        print(f" [x] Sent message to {queue_name}")
 
     except pika.exceptions.AMQPConnectionError as e:
         print(f"Error: Connection to RabbitMQ server failed: {e}")
@@ -69,6 +69,8 @@ def send_message(host: str, queue_name: str, message: str):
     finally:
         # close the connection to the server
         conn.close()
+
+
 
 # Reading in the csv file and sending to Rabbit MQ. 
 # This is the part where I will have to build onto the prior module code.
@@ -87,30 +89,25 @@ def csv_smoker_reader():
             temp_of_smoker = smoke_row[1]
             foodA_temp = smoke_row[2]
             foodB_temp = smoke_row[3]
-# I was having trouble getting my time_of-smoke(timestamp) to show correctly. I finally figured it out by looking at different repos. 
-# I needed to convert to Unix and after that, my producer worked great!
-        # This sets up the file to be parsed into the matching CSV format
+            # I was having trouble getting my time_of-smoke(timestamp) to show correctly. I finally figured it out by looking at different repos. 
+            # I needed to convert to Unix and after that, my producer worked great!
+            # This sets up the file to be parsed into the matching CSV format
+            time_of_smoke = datetime.datetime.strptime(time_of_smoke, '%m/%d/%y %H:%M:%S').timestamp()
 
-        time_of_smoke = datetime.strptime(time_of_smoke, '%m/%d/%y %H:%M:%S').timestamp()
+            # The below will read the CSV rows and send the correct data to the correct Rabbit Queue. 
+            # I have already established parameters in the "smoke_row" code above. 
+            # The below code acts as a filter for the csv_smoker_reader. 
+            if temp_of_smoker:
+                message = struct.pack('!df', time_of_smoke, float(temp_of_smoker))
+                send_message("localhost","01-smoker", message)
+            if foodA_temp:
+                message = struct.pack('!df', time_of_smoke, float(foodA_temp))
+                send_message("localhost","02-food-A", message) 
+            if foodB_temp:
+                message = struct.pack('!df', time_of_smoke, float(foodB_temp))
+                send_message("localhost","03-food-B", message) 
 
-# The below will read the CSV rows and send the correct data to the correct Rabbit Queue. 
-# I have already established parameters in the "smoke_row" code above. 
-# The below code acts as a filter for the csv_smoker_reader. 
-
-        if temp_of_smoker:
-            message = struct.pack('!df', time_of_smoke, float(temp_of_smoker))
-            send_message("localhost","01-smoker", message)
-        if foodA_temp:
-            message = struct.pack('!df', time_of_smoke, float(foodA_temp))
-            send_message("localhost","02-food-A", message) 
-        if foodB_temp:
-            message = struct.pack('!df', time_of_smoke, float(foodB_temp))
-            send_message("localhost","03-food-B", message) 
-
-        time.sleep(30) # Ensures the programs delays 30 seconds during the reading process. 
-
-        
-
+                time.sleep(30) # Ensures the programs delays 30 seconds during the reading process. 
 
 # Standard Python idiom to indicate main program entry point
 # This allows us to import this module and use its functions
