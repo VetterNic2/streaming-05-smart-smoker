@@ -1,6 +1,6 @@
 # streaming-05-smart-smoker
 # Author: Nic Vetter
-## Module 5: Creating a Producer
+## Module 5&6: Creating a Producer
 
 Throughout this module, I will create a producer using python and RabbitMQ. 
 
@@ -60,5 +60,60 @@ AFTER earning credit for the assignment, THEN create and share additional custom
 # Screenshot Verification of Working Custom Producer:
 
 ![Alt text](work_verification.png "Verification")
+
+
+# Module 6 - Custom Consumer with 3 callback functions
+
+In Module 5, we understood the process, designed our system, and implemented the producer. In this Module 6, we'll add the consumers, implementing analytics based on a rolling window of time, and raise an alert when interesting events are detected. 
+
+Please read and follow the guidelines below.
+
+# M6 Requirements below:
+
+We want know if:
+
+The smoker temperature decreases by more than 15 degrees F in 2.5 minutes (smoker alert!)
+Any food temperature changes less than 1 degree F in 10 minutes (food stall!)
+Time Windows
+
+Smoker time window is 2.5 minutes
+Food time window is 10 minutes
+Deque Max Length
+
+At one reading every 1/2 minute, the smoker deque max length is 5 (2.5 min * 1 reading/0.5 min)
+At one reading every 1/2 minute, the food deque max length is 20 (10 min * 1 reading/0.5 min) 
+Condition To monitor
+
+If smoker temp decreases by 15 F or more in 2.5 min (or 5 readings)  --> smoker alert!
+If food temp change in temp is 1 F or less in 10 min (or 20 readings)  --> food stall alert!
+
+# M6 Tasks Completed below:
+
+Task 1. Open Your Existing Project
+On your machine, open your existing streaming-05-getting-started repo in VS Code.
+Create a file for your consumer (or 3 files if you'd like to use 3 consumers).
+ 
+
+Task 2. Design and Implement Each Consumer
+Design and implement each bbq consumer. You could have one. You could have 3.  More detailed help provided in links below. 
+Use the logic, approach, and structure from prior modules (use the recommended versions).
+Modifying them to serve your purpose IS part of the assignment.
+Do not start from scratch - do not search for code - do not use a notebook.
+Use comments in the code and repo to explain your work. 
+Use docstring comments and add your name and date to your README and your code files. 
+ 
+
+Task 3. Professionally Present your Project
+Explain your project in the README.
+Include your name, date.
+Include prerequisites and how to run your code. 
+Explain and show how your project works. 
+Tell us what commands are needed. Use code fencing in GitHub or backtics for inline code to share commands.
+Display screenshots of your console with the producer and consumer running.
+Display screenshots of at least one interesting part of the RabbitMQ console. 
+
+# M6 Screenshot of working Consumer with Alerts below:
+
+![Alt text](working_consumer+stall_alerts.png "Verification")
 
 -Nic Vetter
